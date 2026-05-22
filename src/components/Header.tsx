@@ -37,10 +37,6 @@ export default function Header({ active }: { active: Active }) {
           }}
         >
           <div style={{ fontWeight: 900, fontSize: 20 }}>全国おみやげランキング</div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <span style={badgeStyle}>社内限定</span>
-            <span style={badgeStyle}>身内用</span>
-          </div>
         </div>
       </div>
 
@@ -55,13 +51,3 @@ export default function Header({ active }: { active: Active }) {
     </header>
   );
 }
-
-const badgeStyle: React.CSSProperties = {
-  display: "inline-block",
-  padding: "6px 10px",
-  borderRadius: 6,
-  border: "1px solid rgba(255,255,255,0.35)",
-  background: "rgba(255,255,255,0.15)",
-  fontSize: 12,
-  fontWeight: 800,
-};

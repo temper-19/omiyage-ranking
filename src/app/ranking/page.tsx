@@ -59,9 +59,6 @@ export default function RankingPage() {
             <div style={{ color: "#666", fontSize: 12 }}>
               ※総合点は「権威性・満足度・希少性・味」の合計です（最大20点）
             </div>
-            <div style={{ color: "#666", fontSize: 12, marginTop: 6 }}>
-              ※商品名クリックで編集できる
-            </div>
           </div>
 
           <button style={btn} onClick={load} type="button">
@@ -101,9 +98,6 @@ export default function RankingPage() {
                       <Link href={`/edit/${r.id}`} style={nameLink}>
                         {r.name}
                       </Link>
-                      <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>
-                        クリックで編集
-                      </div>
                     </td>
 
                     <td style={td}>{r.pref}</td>
