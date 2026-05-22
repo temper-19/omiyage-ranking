@@ -1,4 +1,10 @@
-import { supabase } from "@/lib/supabaseClient";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+const TABLE = "omiyage";
 
 export type OmiyageRow = {
   id: string;
@@ -9,53 +15,51 @@ export type OmiyageRow = {
   rarity: number;
   taste: number;
   total: number;
-  updated_at: string;
-  created_at: string;
+  created_at?: string;
+  updated_at?: string | null;
 };
 
-const TABLE = "omiyage_ratings";
+export type OmiyageInsert = Omit<OmiyageRow, "id" | "created_at" | "updated_at">;
 
 export async function fetchOmiyageList(): Promise<OmiyageRow[]> {
   const { data, error } = await supabase
     .from(TABLE)
     .select("*")
     .order("total", { ascending: false })
-    .order("updated_at", { ascending: false });
+    .order("created_at", { ascending: true });
 
   if (error) throw error;
   return (data ?? []) as OmiyageRow[];
 }
 
-export async function insertOmiyage(input: {
-  name: string;
-  pref: string;
-  authority: number;
-  satisfaction: number;
-  rarity: number;
-  taste: number;
-  total: number;
-}) {
-  const now = new Date().toISOString();
+export async function fetchOmiyageById(id: string): Promise<OmiyageRow | null> {
+  const { data, error } = await supabase
+    .from(TABLE)
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
 
-  const { error } = await supabase.from(TABLE).insert([
-    {
-      ...input,
-      updated_at: now,
-    },
-  ]);
+  if (error) throw error;
+  return (data ?? null) as OmiyageRow | null;
+}
 
+export async function insertOmiyage(payload: OmiyageInsert) {
+  const { error } = await supabase.from(TABLE).insert({
+    ...payload,
+  });
   if (error) throw error;
 }
 
 export async function updateOmiyage(
   id: string,
-  patch: Partial<Pick<OmiyageRow, "name" | "pref" | "authority" | "satisfaction" | "rarity" | "taste" | "total">>
+  payload: OmiyageInsert
 ) {
-  const now = new Date().toISOString();
-
   const { error } = await supabase
     .from(TABLE)
-    .update({ ...patch, updated_at: now })
+    .update({
+      ...payload,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", id);
 
   if (error) throw error;

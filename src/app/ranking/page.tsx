@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
 import { fetchOmiyageList, OmiyageRow } from "@/lib/omiyageDb";
+import Link from "next/link";
 
 export default function RankingPage() {
   const [rows, setRows] = useState<OmiyageRow[]>([]);
@@ -27,6 +28,7 @@ export default function RankingPage() {
     load();
   }, []);
 
+  // 今は画面に出してないけど、あとで統計ほしくなった時用に残しとく（邪魔なら消してOK）
   const avg = useMemo(() => {
     if (rows.length === 0) return 0;
     const sum = rows.reduce((a, r) => a + Number(r.total ?? 0), 0);
@@ -43,11 +45,22 @@ export default function RankingPage() {
       <Header active="ranking" />
 
       <main style={panel}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", padding: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            alignItems: "center",
+            padding: 16,
+          }}
+        >
           <div>
             <h1 style={h1}>全国おみやげ総合ランキング</h1>
             <div style={{ color: "#666", fontSize: 12 }}>
               ※総合点は「権威性・満足度・希少性・味」の合計です（最大20点）
+            </div>
+            <div style={{ color: "#666", fontSize: 12, marginTop: 6 }}>
+              ※商品名クリックで編集できる
             </div>
           </div>
 
@@ -75,14 +88,26 @@ export default function RankingPage() {
                   <th style={th}>味</th>
                 </tr>
               </thead>
+
               <tbody>
                 {rows.map((r, i) => (
                   <tr key={r.id}>
                     <td style={td}>
                       <span style={rankBadge(i + 1)}>{i + 1}</span>
                     </td>
-                    <td style={td}>{r.name}</td>
+
+                    {/* ★ここ：商品名クリックで /edit/[id] へ */}
+                    <td style={td}>
+                      <Link href={`/edit/${r.id}`} style={nameLink}>
+                        {r.name}
+                      </Link>
+                      <div style={{ fontSize: 11, color: "#666", marginTop: 4 }}>
+                        クリックで編集
+                      </div>
+                    </td>
+
                     <td style={td}>{r.pref}</td>
+
                     <td style={{ ...td, color: "#b30000", fontWeight: 1000 }}>
                       {Number(r.total).toFixed(1)}
                     </td>
@@ -92,6 +117,7 @@ export default function RankingPage() {
                     <td style={td}>{Number(r.taste).toFixed(1)}</td>
                   </tr>
                 ))}
+
                 {rows.length === 0 && (
                   <tr>
                     <td style={td} colSpan={8}>
@@ -105,8 +131,6 @@ export default function RankingPage() {
             <div style={{ padding: 12, fontSize: 12, color: "#666" }}>
               ※本ランキングは個人的な評価に基づくものです。
             </div>
-
-           
           </>
         )}
       </main>
@@ -167,4 +191,8 @@ const rankBadge = (n: number): React.CSSProperties => ({
   background: n <= 3 ? "#ffd36b" : "#fff",
 });
 
-
+const nameLink: React.CSSProperties = {
+  color: "#0066cc",
+  textDecoration: "underline",
+  fontWeight: 900,
+};
